@@ -1,14 +1,19 @@
 // This file is bundled into the client. Keep it light.
 let initialized = false
 
+const DISMISSED_KEY = 'statuspage-banner-dismissed'
+const DISMISSED_INCIDENT_KEY = 'statuspage-banner-incident-id'
+
 type StatuspageSummary = {
   status?: { indicator?: string; description?: string }
-  incidents?: Array<{ name?: string; shortlink?: string; status?: string }>
+  incidents?: Array<{ id?: string; name?: string; shortlink?: string; status?: string }>
 }
 
 function createBannerContainer(position: string) {
   const container = document.createElement('div')
   container.setAttribute('data-statuspage-banner', 'true')
+  container.setAttribute('role', 'status')
+  container.setAttribute('aria-live', 'polite')
   container.style.position = 'fixed'
   container.style.zIndex = '9999'
   container.style.maxWidth = '420px'
@@ -24,7 +29,7 @@ function createBannerContainer(position: string) {
   return container
 }
 
-function renderBanner(container: HTMLElement, message: string, linkHref: string, linkLabel: string) {
+function renderBanner(container: HTMLElement, message: string, linkHref: string, linkLabel: string, incidentId?: string) {
   const wrapper = document.createElement('div')
   wrapper.style.background = 'var(--ifm-color-emphasis-200, #f9f9fb)'
   wrapper.style.border = '1px solid var(--ifm-color-emphasis-300, #e5e7eb)'
@@ -43,6 +48,7 @@ function renderBanner(container: HTMLElement, message: string, linkHref: string,
   dot.style.height = '10px'
   dot.style.borderRadius = '50%'
   dot.style.background = '#f59e0b' // amber for degraded
+  dot.setAttribute('aria-hidden', 'true')
 
   const text = document.createElement('span')
   text.textContent = message
@@ -55,6 +61,8 @@ function renderBanner(container: HTMLElement, message: string, linkHref: string,
   link.textContent = linkLabel
   link.style.whiteSpace = 'nowrap'
   link.style.fontWeight = '600'
+  link.style.color = 'var(--ifm-color-primary, #2563eb)'
+  link.style.textDecoration = 'underline'
 
   const close = document.createElement('button')
   close.type = 'button'
@@ -66,7 +74,17 @@ function renderBanner(container: HTMLElement, message: string, linkHref: string,
   close.style.fontSize = '18px'
   close.style.lineHeight = '1'
   close.style.padding = '0 0 0 6px'
-  close.onclick = () => container.remove()
+  close.onclick = () => {
+    try {
+      localStorage.setItem(DISMISSED_KEY, Date.now().toString())
+      if (incidentId) {
+        localStorage.setItem(DISMISSED_INCIDENT_KEY, incidentId)
+      }
+    } catch {
+      // localStorage may not be available (private browsing, etc.)
+    }
+    container.remove()
+  }
 
   wrapper.appendChild(dot)
   wrapper.appendChild(text)
@@ -91,11 +109,34 @@ async function checkAndRender() {
     const hasIncidents = Array.isArray(data?.incidents) && data!.incidents!.length > 0
     if (indicator === 'none' && !hasIncidents) return
 
+    // Check if user dismissed the banner recently
+    const currentIncidentId = hasIncidents && data!.incidents![0]?.id ? data!.incidents![0]!.id : undefined
+    try {
+      const dismissedTime = localStorage.getItem(DISMISSED_KEY)
+      const dismissedIncidentId = localStorage.getItem(DISMISSED_INCIDENT_KEY)
+
+      if (dismissedTime) {
+        const hoursSinceDismissal = (Date.now() - parseInt(dismissedTime, 10)) / (1000 * 60 * 60)
+        // Don't show banner if dismissed within last 24 hours AND it's the same incident (or no incident)
+        if (hoursSinceDismissal < 24) {
+          // If there's a current incident and it's different from the dismissed one, show the banner
+          if (currentIncidentId && dismissedIncidentId !== currentIncidentId) {
+            // New incident - show banner
+          } else {
+            // Same incident or general degradation - respect dismissal
+            return
+          }
+        }
+      }
+    } catch {
+      // localStorage not available, continue to show banner
+    }
+
     const message = data?.status?.description || 'Some services are degraded'
     const linkHref = hasIncidents && data!.incidents![0]?.shortlink ? data!.incidents![0]!.shortlink! : baseUrl
 
     const container = createBannerContainer(position)
-    renderBanner(container, message, linkHref, linkLabel)
+    renderBanner(container, message, linkHref, linkLabel, currentIncidentId)
     document.body.appendChild(container)
   } catch {
     // Fail silently

@@ -4,7 +4,7 @@ import type { StatuspageGlobalData, StatuspagePluginOptions } from './types'
 export default function pluginStatuspage(
   _context: LoadContext,
   options: StatuspagePluginOptions
-): Plugin<void> {
+): Plugin<StatuspageGlobalData | undefined> {
   const enabled = options.enabled ?? true
   const position = options.position ?? 'bottom-left'
   const linkLabel = options.linkLabel ?? 'View status'
