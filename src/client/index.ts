@@ -1,12 +1,59 @@
 // This file is bundled into the client. Keep it light.
 let initialized = false
 
-const DISMISSED_KEY = 'statuspage-banner-dismissed'
-const DISMISSED_INCIDENT_KEY = 'statuspage-banner-incident-id'
+const DISMISSED_BANNERS_KEY = 'statuspage-dismissed-banners'
 
 type StatuspageSummary = {
   status?: { indicator?: string; description?: string }
   incidents?: Array<{ id?: string; name?: string; shortlink?: string; status?: string }>
+}
+
+function generateBannerId(data: StatuspageSummary, hasIncidents: boolean): string {
+  // Use incident ID if available, otherwise create ID from status
+  if (hasIncidents && data.incidents?.[0]?.id) {
+    return `incident-${data.incidents[0].id}`
+  }
+  // For general degradation, use indicator + description hash
+  const indicator = data?.status?.indicator || 'none'
+  const description = data?.status?.description || ''
+  return `status-${indicator}-${simpleHash(description)}`
+}
+
+function simpleHash(str: string): string {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(36)
+}
+
+function isDismissed(bannerId: string): boolean {
+  try {
+    const dismissed = localStorage.getItem(DISMISSED_BANNERS_KEY)
+    if (!dismissed) return false
+    const dismissedList = JSON.parse(dismissed) as string[]
+    return dismissedList.includes(bannerId)
+  } catch {
+    return false
+  }
+}
+
+function addDismissed(bannerId: string): void {
+  try {
+    const dismissed = localStorage.getItem(DISMISSED_BANNERS_KEY)
+    let dismissedList: string[] = []
+    if (dismissed) {
+      dismissedList = JSON.parse(dismissed) as string[]
+    }
+    if (!dismissedList.includes(bannerId)) {
+      dismissedList.push(bannerId)
+      localStorage.setItem(DISMISSED_BANNERS_KEY, JSON.stringify(dismissedList))
+    }
+  } catch {
+    // localStorage may not be available (private browsing, etc.)
+  }
 }
 
 function createBannerContainer(position: string) {
@@ -29,7 +76,7 @@ function createBannerContainer(position: string) {
   return container
 }
 
-function renderBanner(container: HTMLElement, message: string, linkHref: string, linkLabel: string, incidentId?: string) {
+function renderBanner(container: HTMLElement, message: string, linkHref: string, linkLabel: string, bannerId: string) {
   const wrapper = document.createElement('div')
   wrapper.style.background = 'var(--ifm-color-emphasis-200, #f9f9fb)'
   wrapper.style.border = '1px solid var(--ifm-color-emphasis-300, #e5e7eb)'
@@ -75,14 +122,7 @@ function renderBanner(container: HTMLElement, message: string, linkHref: string,
   close.style.lineHeight = '1'
   close.style.padding = '0 0 0 6px'
   close.onclick = () => {
-    try {
-      localStorage.setItem(DISMISSED_KEY, Date.now().toString())
-      if (incidentId) {
-        localStorage.setItem(DISMISSED_INCIDENT_KEY, incidentId)
-      }
-    } catch {
-      // localStorage may not be available (private browsing, etc.)
-    }
+    addDismissed(bannerId)
     container.remove()
   }
 
@@ -109,34 +149,19 @@ async function checkAndRender() {
     const hasIncidents = Array.isArray(data?.incidents) && data!.incidents!.length > 0
     if (indicator === 'none' && !hasIncidents) return
 
-    // Check if user dismissed the banner recently
-    const currentIncidentId = hasIncidents && data!.incidents![0]?.id ? data!.incidents![0]!.id : undefined
-    try {
-      const dismissedTime = localStorage.getItem(DISMISSED_KEY)
-      const dismissedIncidentId = localStorage.getItem(DISMISSED_INCIDENT_KEY)
+    // Generate unique ID for this banner
+    const bannerId = generateBannerId(data, hasIncidents)
 
-      if (dismissedTime) {
-        const hoursSinceDismissal = (Date.now() - parseInt(dismissedTime, 10)) / (1000 * 60 * 60)
-        // Don't show banner if dismissed within last 24 hours AND it's the same incident (or no incident)
-        if (hoursSinceDismissal < 24) {
-          // If there's a current incident and it's different from the dismissed one, show the banner
-          if (currentIncidentId && dismissedIncidentId !== currentIncidentId) {
-            // New incident - show banner
-          } else {
-            // Same incident or general degradation - respect dismissal
-            return
-          }
-        }
-      }
-    } catch {
-      // localStorage not available, continue to show banner
+    // Check if this specific banner has been dismissed
+    if (isDismissed(bannerId)) {
+      return
     }
 
     const message = data?.status?.description || 'Some services are degraded'
     const linkHref = hasIncidents && data!.incidents![0]?.shortlink ? data!.incidents![0]!.shortlink! : baseUrl
 
     const container = createBannerContainer(position)
-    renderBanner(container, message, linkHref, linkLabel, currentIncidentId)
+    renderBanner(container, message, linkHref, linkLabel, bannerId)
     document.body.appendChild(container)
   } catch {
     // Fail silently
