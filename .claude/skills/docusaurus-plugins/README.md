@@ -1,6 +1,6 @@
-# Docusaurus Statuspage
+# Docusaurus Plugin Guide
 
-Skill for working with the Docusaurus Statuspage plugin, which integrates Statuspage.io status updates into Docusaurus sites
+Guide for creating different types of Docusaurus plugins including remark, rehype, theme, content, and lifecycle plugins
 
 ## Structure
 

@@ -56,10 +56,10 @@ Access global data set by the plugin from any theme component:
 import React from 'react'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 
-export default function Greeting() {
+export default function StatusInfo() {
   const { globalData } = useDocusaurusContext()
-  const data = globalData['docusaurus-plugin-starter']?.default
-  return <div>{data?.greeting}</div>
+  const data = globalData['docusaurus-plugin-statuspage']?.default
+  return <div>{data?.statuspageUrl}</div>
 }
 ```
 
