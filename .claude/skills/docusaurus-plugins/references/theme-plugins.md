@@ -14,7 +14,7 @@ Theme plugins provide custom **themes** and allow **component swizzling** to ove
 
 ```javascript
 // plugins/theme-custom/index.js
-const path = require('path');
+const path = require('path')
 
 module.exports = function themePlugin(context, options) {
   return {
@@ -22,12 +22,12 @@ module.exports = function themePlugin(context, options) {
 
     getThemePath() {
       // Return path to theme components
-      return path.resolve(__dirname, './theme');
+      return path.resolve(__dirname, './theme')
     },
 
     getTypeScriptThemePath() {
       // Return path to TypeScript theme types
-      return path.resolve(__dirname, './theme');
+      return path.resolve(__dirname, './theme')
     },
 
     getClientModules() {
@@ -35,10 +35,10 @@ module.exports = function themePlugin(context, options) {
       return [
         path.resolve(__dirname, './theme/global.css'),
         path.resolve(__dirname, './theme/prism-theme.js'),
-      ];
+      ]
     },
-  };
-};
+  }
+}
 ```
 
 ## Theme Directory Structure
@@ -81,7 +81,7 @@ module.exports = {
       },
     ],
   ],
-};
+}
 ```
 
 ## Component Swizzling
@@ -128,13 +128,13 @@ npm run swizzle @docusaurus/theme-classic Navbar -- --typescript
 
 ```javascript
 // theme/Navbar.js
-import React from 'react';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import './Navbar.css';
+import React from 'react'
+import Link from '@docusaurus/Link'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import './Navbar.css'
 
 export default function Navbar() {
-  const { siteConfig } = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext()
 
   return (
     <nav className="custom-navbar">
@@ -158,7 +158,7 @@ export default function Navbar() {
         </a>
       </div>
     </nav>
-  );
+  )
 }
 ```
 
@@ -166,13 +166,13 @@ export default function Navbar() {
 
 ```javascript
 // theme/Footer.js
-import React from 'react';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import React from 'react'
+import Link from '@docusaurus/Link'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 
 export default function Footer() {
-  const { siteConfig } = useDocusaurusContext();
-  const currentYear = new Date().getFullYear();
+  const { siteConfig } = useDocusaurusContext()
+  const currentYear = new Date().getFullYear()
 
   return (
     <footer className="custom-footer">
@@ -229,7 +229,7 @@ export default function Footer() {
         </p>
       </div>
     </footer>
-  );
+  )
 }
 ```
 
@@ -237,12 +237,12 @@ export default function Footer() {
 
 ```javascript
 // theme/MDXComponents.js
-import React from 'react';
-import MDXComponents from '@theme-original/MDXComponents';
-import Highlight from '@site/src/components/Highlight';
-import CodeBlock from '@theme/CodeBlock';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import React from 'react'
+import MDXComponents from '@theme-original/MDXComponents'
+import Highlight from '@site/src/components/Highlight'
+import CodeBlock from '@theme/CodeBlock'
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
 
 // Custom components available in MDX
 export default {
@@ -270,23 +270,23 @@ export default {
 
   Tabs,
   TabItem,
-};
+}
 ```
 
 ### 4. Custom Layout
 
 ```javascript
 // theme/Layout.js
-import React from 'react';
-import Head from '@docusaurus/Head';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Navbar from '@theme/Navbar';
-import Footer from '@theme/Footer';
-import './Layout.css';
+import React from 'react'
+import Head from '@docusaurus/Head'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import Navbar from '@theme/Navbar'
+import Footer from '@theme/Footer'
+import './Layout.css'
 
 export default function Layout({ children, title, description }) {
-  const { siteConfig } = useDocusaurusContext();
-  const pageTitle = title ? `${title} | ${siteConfig.title}` : siteConfig.title;
+  const { siteConfig } = useDocusaurusContext()
+  const pageTitle = title ? `${title} | ${siteConfig.title}` : siteConfig.title
 
   return (
     <>
@@ -303,7 +303,7 @@ export default function Layout({ children, title, description }) {
         <Footer />
       </div>
     </>
-  );
+  )
 }
 ```
 
@@ -311,17 +311,17 @@ export default function Layout({ children, title, description }) {
 
 ```javascript
 // theme/DocPage.js (wrapped)
-import React from 'react';
-import DocPage from '@theme-original/DocPage';
-import { useLocation } from '@docusaurus/router';
+import React from 'react'
+import DocPage from '@theme-original/DocPage'
+import { useLocation } from '@docusaurus/router'
 
 export default function DocPageWrapper(props) {
-  const location = useLocation();
+  const location = useLocation()
 
   // Add custom behavior before/after original component
   React.useEffect(() => {
-    console.log('Doc page viewed:', location.pathname);
-  }, [location]);
+    console.log('Doc page viewed:', location.pathname)
+  }, [location])
 
   return (
     <>
@@ -334,7 +334,7 @@ export default function DocPageWrapper(props) {
       {/* Custom elements after */}
       <div className="custom-feedback">Was this helpful?</div>
     </>
-  );
+  )
 }
 ```
 
@@ -431,9 +431,9 @@ const theme = {
       },
     },
   ],
-};
+}
 
-export default theme;
+export default theme
 ```
 
 ## Package Structure
@@ -462,18 +462,18 @@ export default theme;
 
 ```typescript
 // index.d.ts
-import { Plugin, LoadContext } from '@docusaurus/types';
+import { Plugin, LoadContext } from '@docusaurus/types'
 
 export interface ThemeOptions {
   customColors?: {
-    primary?: string;
-    secondary?: string;
-  };
+    primary?: string
+    secondary?: string
+  }
 }
 
-declare const theme: (context: LoadContext, options: ThemeOptions) => Plugin<void>;
+declare const theme: (context: LoadContext, options: ThemeOptions) => Plugin<void>
 
-export default theme;
+export default theme
 ```
 
 ## Best Practices
@@ -492,11 +492,11 @@ export default theme;
 
 ```javascript
 // theme/ColorModeToggle.js
-import React from 'react';
-import { useColorMode } from '@docusaurus/theme-common';
+import React from 'react'
+import { useColorMode } from '@docusaurus/theme-common'
 
 export default function ColorModeToggle() {
-  const { colorMode, setColorMode } = useColorMode();
+  const { colorMode, setColorMode } = useColorMode()
 
   return (
     <button
@@ -505,7 +505,7 @@ export default function ColorModeToggle() {
     >
       {colorMode === 'dark' ? '🌞' : '🌙'}
     </button>
-  );
+  )
 }
 ```
 
@@ -513,11 +513,11 @@ export default function ColorModeToggle() {
 
 ```javascript
 // theme/SearchBar.js
-import React from 'react';
-import { DocSearch } from '@docsearch/react';
+import React from 'react'
+import { DocSearch } from '@docsearch/react'
 
 export default function SearchBar() {
-  return <DocSearch appId="YOUR_APP_ID" indexName="YOUR_INDEX_NAME" apiKey="YOUR_SEARCH_API_KEY" />;
+  return <DocSearch appId="YOUR_APP_ID" indexName="YOUR_INDEX_NAME" apiKey="YOUR_SEARCH_API_KEY" />
 }
 ```
 
@@ -525,22 +525,22 @@ export default function SearchBar() {
 
 ```javascript
 // theme/NavbarItem/DocsVersionDropdown.js
-import React from 'react';
-import { useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client';
+import React from 'react'
+import { useActiveVersion, useVersions } from '@docusaurus/plugin-content-docs/client'
 
 export default function DocsVersionDropdown() {
-  const versions = useVersions();
-  const activeVersion = useActiveVersion();
+  const versions = useVersions()
+  const activeVersion = useActiveVersion()
 
   return (
-    <select value={activeVersion.name} onChange={e => (window.location.href = e.target.value)}>
-      {versions.map(version => (
+    <select value={activeVersion.name} onChange={(e) => (window.location.href = e.target.value)}>
+      {versions.map((version) => (
         <option key={version.name} value={version.path}>
           {version.label}
         </option>
       ))}
     </select>
-  );
+  )
 }
 ```
 

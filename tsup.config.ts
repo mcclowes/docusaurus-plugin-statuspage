@@ -9,6 +9,6 @@ export default defineConfig({
   format: ['cjs', 'esm'],
   sourcemap: true,
   clean: true,
-  target: 'es2019',
+  target: 'es2020',
+  shims: true,
 })
-

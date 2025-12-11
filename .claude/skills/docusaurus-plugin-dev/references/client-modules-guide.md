@@ -20,35 +20,35 @@ module.exports = function (context, options) {
     name: 'docusaurus-plugin-image-zoom',
     getClientModules() {
       // This path is bundled into every page
-      return [path.resolve(__dirname, './zoom')];
+      return [path.resolve(__dirname, './zoom')]
     },
-  };
-};
+  }
+}
 
 // Client file: src/zoom.ts
-import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-import mediumZoom from 'medium-zoom';
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment'
+import mediumZoom from 'medium-zoom'
 
 export default (function () {
   // SSR guard - exit if running on server
   if (!ExecutionEnvironment.canUseDOM) {
-    return null;
+    return null
   }
 
   return {
     onRouteUpdate({ location }) {
       // This runs every time user navigates
       // Find all images in markdown content
-      const selector = '.markdown img';
+      const selector = '.markdown img'
 
       // Initialize zoom on them
       mediumZoom(selector, {
         margin: 24,
         background: 'rgba(0, 0, 0, 0.9)',
-      });
+      })
     },
-  };
-})();
+  }
+})()
 ```
 
 ## Why This Pattern is Elegant
@@ -114,26 +114,26 @@ onRouteDidUpdate({ location, previousLocation }) {
 When using libraries that need explicit cleanup:
 
 ```typescript
-let zoomInstance = null;
+let zoomInstance = null
 
 export default (function () {
-  if (!ExecutionEnvironment.canUseDOM) return null;
+  if (!ExecutionEnvironment.canUseDOM) return null
 
   return {
     onRouteUpdate() {
       // Cleanup previous instance
       if (zoomInstance) {
-        zoomInstance.detach();
-        zoomInstance = null;
+        zoomInstance.detach()
+        zoomInstance = null
       }
 
       // Initialize new instance
       setTimeout(() => {
-        zoomInstance = mediumZoom('.markdown img');
-      }, 100);
+        zoomInstance = mediumZoom('.markdown img')
+      }, 100)
     },
-  };
-})();
+  }
+})()
 ```
 
 ### Pattern: Configuration from Plugin Options
@@ -147,71 +147,71 @@ export default function myPlugin(context, options) {
     async contentLoaded({ actions }) {
       actions.setGlobalData({
         config: options,
-      });
+      })
     },
 
     getClientModules() {
-      return [require.resolve('./client')];
+      return [require.resolve('./client')]
     },
-  };
+  }
 }
 
 // Client reads config from global data
 export default (function () {
-  if (!ExecutionEnvironment.canUseDOM) return null;
+  if (!ExecutionEnvironment.canUseDOM) return null
 
   return {
     onRouteUpdate() {
-      const globalData = (window as any).docusaurus?.globalData;
-      const config = globalData?.['my-plugin']?.default?.config;
+      const globalData = (window as any).docusaurus?.globalData
+      const config = globalData?.['my-plugin']?.default?.config
 
       if (config?.enabled) {
         // Use configuration
       }
     },
-  };
-})();
+  }
+})()
 ```
 
 ### Pattern: Conditional Enhancement by Route
 
 ```typescript
 export default (function () {
-  if (!ExecutionEnvironment.canUseDOM) return null;
+  if (!ExecutionEnvironment.canUseDOM) return null
 
   return {
     onRouteUpdate({ location }) {
       // Only enhance docs pages
       if (location.pathname.startsWith('/docs')) {
-        const codeBlocks = document.querySelectorAll('pre code');
-        codeBlocks.forEach(addCopyButton);
+        const codeBlocks = document.querySelectorAll('pre code')
+        codeBlocks.forEach(addCopyButton)
       }
     },
-  };
-})();
+  }
+})()
 ```
 
 ### Pattern: Debounced Operations
 
 ```typescript
-let debounceTimer: NodeJS.Timeout;
+let debounceTimer: NodeJS.Timeout
 
 export default (function () {
-  if (!ExecutionEnvironment.canUseDOM) return null;
+  if (!ExecutionEnvironment.canUseDOM) return null
 
   return {
     onRouteUpdate() {
       // Clear previous debounce
-      clearTimeout(debounceTimer);
+      clearTimeout(debounceTimer)
 
       // Debounce expensive operations
       debounceTimer = setTimeout(() => {
-        const images = document.querySelectorAll('.markdown img');
-        images.forEach(lazyLoadImage);
-      }, 300);
+        const images = document.querySelectorAll('.markdown img')
+        images.forEach(lazyLoadImage)
+      }, 300)
     },
-  };
-})();
+  }
+})()
 ```
 
 ## Common Pitfalls and Solutions
@@ -264,13 +264,13 @@ onRouteUpdate() {
 
 ```typescript
 // ❌ BAD - crashes during SSR
-import fs from 'fs';
+import fs from 'fs'
 
 // ✅ GOOD - safe check
-import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment'
 
 if (!ExecutionEnvironment.canUseDOM) {
-  export default null;
+  export default null
 }
 ```
 

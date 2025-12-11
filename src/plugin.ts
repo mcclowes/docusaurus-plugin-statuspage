@@ -1,5 +1,9 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
 import type { LoadContext, Plugin } from '@docusaurus/types'
 import type { StatuspageGlobalData, StatuspagePluginOptions } from './types'
+
+const pluginDirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default function pluginStatuspage(
   _context: LoadContext,
@@ -33,7 +37,7 @@ export default function pluginStatuspage(
     getClientModules() {
       if (!enabled) return []
       if (!options.statuspageUrl) return []
-      return [require.resolve('./client')]
+      return [path.resolve(pluginDirname, './client')]
     },
 
     injectHtmlTags() {
@@ -54,4 +58,3 @@ export default function pluginStatuspage(
     },
   }
 }
-

@@ -15,27 +15,27 @@ export default function myPlugin(context, options): Plugin {
   return {
     name: 'my-plugin',
     getClientModules() {
-      return [require.resolve('./client')];
+      return [require.resolve('./client')]
     },
-  };
+  }
 }
 
 // src/client/index.ts - Enhance DOM automatically on every page
-import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment'
 
 export default (function () {
-  if (!ExecutionEnvironment.canUseDOM) return null;
+  if (!ExecutionEnvironment.canUseDOM) return null
 
   return {
     onRouteUpdate({ location }) {
       // Runs on every route change - enhance elements automatically
-      document.querySelectorAll('.markdown img').forEach(img => {
-        img.style.cursor = 'zoom-in';
-        img.addEventListener('click', () => console.log('Image clicked'));
-      });
+      document.querySelectorAll('.markdown img').forEach((img) => {
+        img.style.cursor = 'zoom-in'
+        img.addEventListener('click', () => console.log('Image clicked'))
+      })
     },
-  };
-})();
+  }
+})()
 ```
 
 ## Core Principles

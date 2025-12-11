@@ -76,7 +76,13 @@ function createBannerContainer(position: string) {
   return container
 }
 
-function renderBanner(container: HTMLElement, message: string, linkHref: string, linkLabel: string, bannerId: string) {
+function renderBanner(
+  container: HTMLElement,
+  message: string,
+  linkHref: string,
+  linkLabel: string,
+  bannerId: string
+) {
   const wrapper = document.createElement('div')
   wrapper.style.background = 'var(--ifm-color-emphasis-200, #f9f9fb)'
   wrapper.style.border = '1px solid var(--ifm-color-emphasis-300, #e5e7eb)'
@@ -134,7 +140,9 @@ function renderBanner(container: HTMLElement, message: string, linkHref: string,
 }
 
 async function checkAndRender() {
-  const meta = document.querySelector('meta[name="docusaurus-statuspage"]') as HTMLMetaElement | null
+  const meta = document.querySelector(
+    'meta[name="docusaurus-statuspage"]'
+  ) as HTMLMetaElement | null
   if (!meta) return
   const baseUrl = meta.getAttribute('data-statuspage-url') || ''
   if (!baseUrl) return
@@ -158,7 +166,8 @@ async function checkAndRender() {
     }
 
     const message = data?.status?.description || 'Some services are degraded'
-    const linkHref = hasIncidents && data!.incidents![0]?.shortlink ? data!.incidents![0]!.shortlink! : baseUrl
+    const linkHref =
+      hasIncidents && data!.incidents![0]?.shortlink ? data!.incidents![0]!.shortlink! : baseUrl
 
     const container = createBannerContainer(position)
     renderBanner(container, message, linkHref, linkLabel, bannerId)
@@ -175,4 +184,3 @@ export function onClientEntry() {
   // Run after initial paint
   window.requestIdleCallback?.(checkAndRender) || setTimeout(checkAndRender, 0)
 }
-

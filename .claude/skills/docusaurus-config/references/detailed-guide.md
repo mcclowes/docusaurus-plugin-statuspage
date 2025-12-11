@@ -7,14 +7,14 @@ Docusaurus configuration can be in multiple formats:
 ### TypeScript (Recommended)
 
 ```typescript
-import { Config } from '@docusaurus/types';
-import { themes as prismThemes } from 'prism-react-renderer';
+import { Config } from '@docusaurus/types'
+import { themes as prismThemes } from 'prism-react-renderer'
 
 const config: Config = {
   // Configuration here
-};
+}
 
-export default config;
+export default config
 ```
 
 ### JavaScript (ESM)
@@ -22,7 +22,7 @@ export default config;
 ```javascript
 export default {
   // Configuration here
-};
+}
 ```
 
 ### JavaScript (CommonJS)
@@ -30,7 +30,7 @@ export default {
 ```javascript
 module.exports = {
   // Configuration here
-};
+}
 ```
 
 ### Async Configuration
@@ -38,11 +38,11 @@ module.exports = {
 ```typescript
 export default async function createConfig(): Promise<Config> {
   // Import ESM-only packages
-  const mdxMermaid = await import('mdx-mermaid');
+  const mdxMermaid = await import('mdx-mermaid')
 
   return {
     // Configuration here
-  };
+  }
 }
 ```
 
@@ -260,7 +260,7 @@ const config: Config = {
   customFields: {
     apiEndpoint: process.env.API_ENDPOINT,
   },
-};
+}
 ```
 
 ### Babel Customization
@@ -273,7 +273,7 @@ module.exports = {
   plugins: [
     // Your custom Babel plugins
   ],
-};
+}
 ```
 
 ## Troubleshooting

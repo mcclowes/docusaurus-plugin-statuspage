@@ -12,7 +12,7 @@ description: Use when working with docusaurus.config.js/ts files to validate or 
 Configuration lives in `docusaurus.config.js` or `docusaurus.config.ts` at project root.
 
 ```typescript
-import { Config } from '@docusaurus/types';
+import { Config } from '@docusaurus/types'
 
 const config: Config = {
   title: 'My Site', // Required
@@ -37,9 +37,9 @@ const config: Config = {
   customFields: {
     /* unknown fields go here */
   },
-};
+}
 
-export default config;
+export default config
 ```
 
 ## Core Principles

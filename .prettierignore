@@ -1,0 +1,10 @@
+dist/
+node_modules/
+examples/*/node_modules/
+examples/*/.docusaurus/
+examples/*/build/
+coverage/
+playwright-report/
+test-results/
+*.lock
+package-lock.json

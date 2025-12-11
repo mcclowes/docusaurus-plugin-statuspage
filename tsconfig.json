@@ -13,4 +13,3 @@
   },
   "include": ["src", "tsup.config.ts"]
 }
-

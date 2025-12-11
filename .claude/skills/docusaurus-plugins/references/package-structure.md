@@ -230,8 +230,8 @@ docusaurus-plugin-name/
 
 ```typescript
 // index.d.ts
-import { Plugin } from 'unified';
-import { Root } from 'mdast';
+import { Plugin } from 'unified'
+import { Root } from 'mdast'
 
 /**
  * Options for the glossary plugin
@@ -241,52 +241,52 @@ export interface RemarkGlossaryOptions {
    * Directory containing term definitions
    * @default './docs/terms'
    */
-  termsDir?: string;
+  termsDir?: string
 
   /**
    * Root documentation directory
    * @default './docs'
    */
-  docsDir?: string;
+  docsDir?: string
 
   /**
    * Output path for generated glossary
    * @default './docs/glossary.md'
    */
-  glossaryFilepath?: string;
+  glossaryFilepath?: string
 
   /**
    * Custom component path for tooltips
    */
-  componentPath?: string;
+  componentPath?: string
 }
 
 /**
  * Remark plugin for adding glossary tooltips to documentation
  */
-declare const remarkGlossary: Plugin<[RemarkGlossaryOptions?], Root>;
+declare const remarkGlossary: Plugin<[RemarkGlossaryOptions?], Root>
 
-export default remarkGlossary;
+export default remarkGlossary
 ```
 
 ### Lifecycle Plugin Types
 
 ```typescript
 // index.d.ts
-import { Plugin, LoadContext, OptionValidationContext } from '@docusaurus/types';
+import { Plugin, LoadContext, OptionValidationContext } from '@docusaurus/types'
 
 /**
  * Changelog entry data structure
  */
 export interface ChangelogEntry {
-  id: string;
-  slug: string;
-  title: string;
-  version: string;
-  date: string;
-  type: 'feature' | 'fix' | 'breaking' | 'improvement';
-  body: string;
-  filePath: string;
+  id: string
+  slug: string
+  title: string
+  version: string
+  date: string
+  type: 'feature' | 'fix' | 'breaking' | 'improvement'
+  body: string
+  filePath: string
 }
 
 /**
@@ -297,45 +297,45 @@ export interface PluginOptions {
    * Path to changelog directory
    * @default 'changelog'
    */
-  changelogPath?: string;
+  changelogPath?: string
 
   /**
    * Base URL path for changelog routes
    * @default 'changelog'
    */
-  routeBasePath?: string;
+  routeBasePath?: string
 
   /**
    * Glob patterns for files to include
    * @default ['**\/*.md']
    */
-  include?: string[];
+  include?: string[]
 
   /**
    * Generate RSS feed
    * @default true
    */
-  generateRss?: boolean;
+  generateRss?: boolean
 }
 
 /**
  * Plugin content loaded in browser
  */
 export interface PluginContent {
-  entries: ChangelogEntry[];
-  latestVersion: string;
+  entries: ChangelogEntry[]
+  latestVersion: string
 }
 
-declare const plugin: (context: LoadContext, options: PluginOptions) => Plugin<ChangelogEntry[]>;
+declare const plugin: (context: LoadContext, options: PluginOptions) => Plugin<ChangelogEntry[]>
 
-export default plugin;
+export default plugin
 
 /**
  * Validate plugin options
  */
 export function validateOptions(
   context: OptionValidationContext<PluginOptions, PluginOptions>
-): PluginOptions;
+): PluginOptions
 ```
 
 ## Jest Configuration
@@ -358,7 +358,7 @@ module.exports = {
   transform: {
     '^.+\\.jsx?$': 'babel-jest',
   },
-};
+}
 ```
 
 ## ESLint Configuration
@@ -383,7 +383,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'no-console': 'warn',
   },
-};
+}
 ```
 
 ## Prettier Configuration
@@ -569,7 +569,7 @@ module.exports = {
       },
     ],
   ],
-};
+}
 ```
 
 ## Options

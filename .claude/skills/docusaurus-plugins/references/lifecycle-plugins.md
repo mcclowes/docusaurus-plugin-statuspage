@@ -16,11 +16,11 @@ Lifecycle plugins are the most flexible type of Docusaurus plugin. They implemen
 
 ```javascript
 // plugins/my-plugin/index.js
-const path = require('path');
+const path = require('path')
 
 module.exports = function myPlugin(context, options) {
-  const { siteConfig, siteDir } = context;
-  const { customOption = 'default' } = options;
+  const { siteConfig, siteDir } = context
+  const { customOption = 'default' } = options
 
   return {
     name: 'my-custom-plugin',
@@ -28,26 +28,26 @@ module.exports = function myPlugin(context, options) {
     // Load content from files
     async loadContent() {
       // Read files, fetch data, etc.
-      const data = await fetchData();
-      return data;
+      const data = await fetchData()
+      return data
     },
 
     // Make content available globally
     async contentLoaded({ content, actions }) {
-      const { setGlobalData, addRoute, createData } = actions;
+      const { setGlobalData, addRoute, createData } = actions
 
       // Add global data (accessible via useGlobalData hook)
-      setGlobalData({ myData: content });
+      setGlobalData({ myData: content })
 
       // Add custom route
       addRoute({
         path: '/custom-page',
         component: '@site/src/components/CustomPage.js',
         exact: true,
-      });
+      })
 
       // Create data file for component props
-      const dataPath = await createData('my-data.json', JSON.stringify(content));
+      const dataPath = await createData('my-data.json', JSON.stringify(content))
 
       addRoute({
         path: '/data-page',
@@ -56,13 +56,13 @@ module.exports = function myPlugin(context, options) {
           data: dataPath,
         },
         exact: true,
-      });
+      })
     },
 
     // Run after build completes
     async postBuild({ outDir, content }) {
       // Generate additional files
-      await generateSitemap(outDir);
+      await generateSitemap(outDir)
     },
 
     // Inject HTML tags
@@ -93,7 +93,7 @@ module.exports = function myPlugin(context, options) {
             `,
           },
         ],
-      };
+      }
     },
 
     // Modify webpack config
@@ -107,20 +107,20 @@ module.exports = function myPlugin(context, options) {
         plugins: [
           // Custom webpack plugins
         ],
-      };
+      }
     },
 
     // Provide client modules (run in browser)
     getClientModules() {
-      return [path.resolve(__dirname, './clientModule.js')];
+      return [path.resolve(__dirname, './clientModule.js')]
     },
 
     // Get theme path
     getThemePath() {
-      return path.resolve(__dirname, './theme');
+      return path.resolve(__dirname, './theme')
     },
-  };
-};
+  }
+}
 ```
 
 ## Configuration in docusaurus.config.js
@@ -138,7 +138,7 @@ module.exports = {
       },
     ],
   ],
-};
+}
 
 // npm package
 module.exports = {
@@ -153,7 +153,7 @@ module.exports = {
       },
     ],
   ],
-};
+}
 ```
 
 ## Lifecycle Hooks
@@ -324,7 +324,7 @@ export function onRouteUpdate({ location }) {
 ```javascript
 // plugins/analytics/index.js
 module.exports = function analyticsPlugin(context, options) {
-  const { trackingId, anonymizeIP = true } = options;
+  const { trackingId, anonymizeIP = true } = options
 
   return {
     name: 'docusaurus-plugin-analytics',
@@ -351,21 +351,21 @@ module.exports = function analyticsPlugin(context, options) {
             `,
           },
         ],
-      };
+      }
     },
 
     getClientModules() {
-      return [path.resolve(__dirname, './trackPageViews.js')];
+      return [path.resolve(__dirname, './trackPageViews.js')]
     },
-  };
-};
+  }
+}
 
 // plugins/analytics/trackPageViews.js
 export function onRouteUpdate({ location }) {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'page_view', {
       page_path: location.pathname,
-    });
+    })
   }
 }
 ```
@@ -374,19 +374,19 @@ export function onRouteUpdate({ location }) {
 
 ```javascript
 // plugins/rss/index.js
-const fs = require('fs-extra');
-const RSS = require('rss');
+const fs = require('fs-extra')
+const RSS = require('rss')
 
 module.exports = function rssPlugin(context, options) {
-  const { siteConfig } = context;
-  const { feedPath = 'rss.xml', limit = 20 } = options;
+  const { siteConfig } = context
+  const { feedPath = 'rss.xml', limit = 20 } = options
 
   return {
     name: 'docusaurus-plugin-rss',
 
     async postBuild({ outDir }) {
       // Read blog posts from content
-      const posts = await loadBlogPosts();
+      const posts = await loadBlogPosts()
 
       // Create RSS feed
       const feed = new RSS({
@@ -395,83 +395,83 @@ module.exports = function rssPlugin(context, options) {
         feed_url: `${siteConfig.url}/${feedPath}`,
         site_url: siteConfig.url,
         language: 'en',
-      });
+      })
 
       // Add posts to feed
-      posts.slice(0, limit).forEach(post => {
+      posts.slice(0, limit).forEach((post) => {
         feed.item({
           title: post.title,
           description: post.description,
           url: `${siteConfig.url}${post.permalink}`,
           date: post.date,
-        });
-      });
+        })
+      })
 
       // Write RSS file
-      await fs.writeFile(path.join(outDir, feedPath), feed.xml({ indent: true }));
+      await fs.writeFile(path.join(outDir, feedPath), feed.xml({ indent: true }))
     },
-  };
-};
+  }
+}
 ```
 
 ### 3. Dynamic Route Creator
 
 ```javascript
 // plugins/custom-pages/index.js
-const fs = require('fs-extra');
-const matter = require('gray-matter');
+const fs = require('fs-extra')
+const matter = require('gray-matter')
 
 module.exports = function customPagesPlugin(context, options) {
-  const { pagesDir = 'custom-pages' } = options;
+  const { pagesDir = 'custom-pages' } = options
 
   return {
     name: 'docusaurus-plugin-custom-pages',
 
     async loadContent() {
-      const pagesPath = path.join(context.siteDir, pagesDir);
-      const files = await fs.readdir(pagesPath);
+      const pagesPath = path.join(context.siteDir, pagesDir)
+      const files = await fs.readdir(pagesPath)
 
       const pages = await Promise.all(
         files
-          .filter(file => file.endsWith('.md'))
-          .map(async file => {
-            const content = await fs.readFile(path.join(pagesPath, file), 'utf-8');
-            const { data, content: body } = matter(content);
+          .filter((file) => file.endsWith('.md'))
+          .map(async (file) => {
+            const content = await fs.readFile(path.join(pagesPath, file), 'utf-8')
+            const { data, content: body } = matter(content)
 
             return {
               id: file.replace('.md', ''),
               ...data,
               body,
-            };
+            }
           })
-      );
+      )
 
-      return pages;
+      return pages
     },
 
     async contentLoaded({ content, actions }) {
-      const { addRoute, createData } = actions;
+      const { addRoute, createData } = actions
 
       await Promise.all(
-        content.map(async page => {
-          const dataPath = await createData(`page-${page.id}.json`, JSON.stringify(page));
+        content.map(async (page) => {
+          const dataPath = await createData(`page-${page.id}.json`, JSON.stringify(page))
 
           addRoute({
             path: `/${page.slug || page.id}`,
             component: '@site/src/components/CustomPage.js',
             modules: { page: dataPath },
             exact: true,
-          });
+          })
         })
-      );
+      )
     },
-  };
-};
+  }
+}
 
 // src/components/CustomPage.js
-import React from 'react';
-import Layout from '@theme/Layout';
-import MDXContent from '@theme/MDXContent';
+import React from 'react'
+import Layout from '@theme/Layout'
+import MDXContent from '@theme/MDXContent'
 
 export default function CustomPage({ page }) {
   return (
@@ -481,7 +481,7 @@ export default function CustomPage({ page }) {
         <MDXContent>{page.body}</MDXContent>
       </div>
     </Layout>
-  );
+  )
 }
 ```
 
@@ -489,12 +489,12 @@ export default function CustomPage({ page }) {
 
 ```javascript
 // plugins/sitemap/index.js
-const fs = require('fs-extra');
-const { SitemapStream, streamToPromise } = require('sitemap');
+const fs = require('fs-extra')
+const { SitemapStream, streamToPromise } = require('sitemap')
 
 module.exports = function sitemapPlugin(context, options) {
-  const { siteConfig } = context;
-  const { changefreq = 'weekly', priority = 0.7 } = options;
+  const { siteConfig } = context
+  const { changefreq = 'weekly', priority = 0.7 } = options
 
   return {
     name: 'docusaurus-plugin-sitemap',
@@ -502,56 +502,56 @@ module.exports = function sitemapPlugin(context, options) {
     async postBuild({ routes, outDir }) {
       const sitemap = new SitemapStream({
         hostname: siteConfig.url,
-      });
+      })
 
       // Add routes to sitemap
-      routes.forEach(route => {
+      routes.forEach((route) => {
         if (!route.path.includes('*') && !route.path.includes(':')) {
           sitemap.write({
             url: route.path,
             changefreq,
             priority,
-          });
+          })
         }
-      });
+      })
 
-      sitemap.end();
+      sitemap.end()
 
       // Write sitemap
-      const xml = await streamToPromise(sitemap);
-      await fs.writeFile(path.join(outDir, 'sitemap.xml'), xml.toString());
+      const xml = await streamToPromise(sitemap)
+      await fs.writeFile(path.join(outDir, 'sitemap.xml'), xml.toString())
     },
-  };
-};
+  }
+}
 ```
 
 ### 5. Environment Variables Plugin
 
 ```javascript
 // plugins/env-vars/index.js
-const webpack = require('webpack');
+const webpack = require('webpack')
 
 module.exports = function envVarsPlugin(context, options) {
-  const { allowedVars = [] } = options;
+  const { allowedVars = [] } = options
 
   return {
     name: 'docusaurus-plugin-env-vars',
 
     configureWebpack() {
-      const envVars = {};
+      const envVars = {}
 
-      allowedVars.forEach(varName => {
+      allowedVars.forEach((varName) => {
         if (process.env[varName]) {
-          envVars[`process.env.${varName}`] = JSON.stringify(process.env[varName]);
+          envVars[`process.env.${varName}`] = JSON.stringify(process.env[varName])
         }
-      });
+      })
 
       return {
         plugins: [new webpack.DefinePlugin(envVars)],
-      };
+      }
     },
-  };
-};
+  }
+}
 
 // Usage in docusaurus.config.js
 plugins: [
@@ -561,7 +561,7 @@ plugins: [
       allowedVars: ['API_URL', 'ANALYTICS_ID'],
     },
   ],
-];
+]
 ```
 
 ## Package Structure
@@ -583,37 +583,37 @@ docusaurus-plugin-name/
 
 ```typescript
 // index.d.ts
-import { Plugin, LoadContext, OptionValidationContext } from '@docusaurus/types';
+import { Plugin, LoadContext, OptionValidationContext } from '@docusaurus/types'
 
 export interface PluginOptions {
-  customOption?: string;
-  enabled?: boolean;
+  customOption?: string
+  enabled?: boolean
 }
 
-export default function plugin(context: LoadContext, options: PluginOptions): Plugin<any>;
+export default function plugin(context: LoadContext, options: PluginOptions): Plugin<any>
 
 export function validateOptions({
   options,
   validate,
-}: OptionValidationContext<PluginOptions, PluginOptions>): PluginOptions;
+}: OptionValidationContext<PluginOptions, PluginOptions>): PluginOptions
 ```
 
 ## Option Validation
 
 ```javascript
-const { Joi } = require('@docusaurus/utils-validation');
+const { Joi } = require('@docusaurus/utils-validation')
 
 function validateOptions({ options, validate }) {
   const schema = Joi.object({
     customOption: Joi.string().default('default'),
     enabled: Joi.boolean().default(true),
     apiKey: Joi.string().required(),
-  });
+  })
 
-  return validate(schema, options);
+  return validate(schema, options)
 }
 
-module.exports = { validateOptions };
+module.exports = { validateOptions }
 ```
 
 ## Best Practices
@@ -630,7 +630,7 @@ module.exports = { validateOptions };
 
 ```javascript
 // __tests__/plugin.test.js
-const plugin = require('../src/index');
+const plugin = require('../src/index')
 
 describe('My Plugin', () => {
   const context = {
@@ -639,19 +639,19 @@ describe('My Plugin', () => {
       url: 'https://example.com',
       baseUrl: '/',
     },
-  };
+  }
 
   it('returns correct name', () => {
-    const instance = plugin(context, {});
-    expect(instance.name).toBe('my-plugin');
-  });
+    const instance = plugin(context, {})
+    expect(instance.name).toBe('my-plugin')
+  })
 
   it('loads content correctly', async () => {
-    const instance = plugin(context, {});
-    const content = await instance.loadContent();
-    expect(content).toBeDefined();
-  });
-});
+    const instance = plugin(context, {})
+    const content = await instance.loadContent()
+    expect(content).toBeDefined()
+  })
+})
 ```
 
 ## Common Patterns
@@ -661,11 +661,11 @@ describe('My Plugin', () => {
 Use `useGlobalData()` hook in React components:
 
 ```javascript
-import useGlobalData from '@docusaurus/useGlobalData';
+import useGlobalData from '@docusaurus/useGlobalData'
 
 function MyComponent() {
-  const { myData } = useGlobalData()['my-plugin'];
-  return <div>{myData}</div>;
+  const { myData } = useGlobalData()['my-plugin']
+  return <div>{myData}</div>
 }
 ```
 
@@ -674,10 +674,10 @@ function MyComponent() {
 Use `usePluginData()` hook:
 
 ```javascript
-import usePluginData from '@docusaurus/usePluginData';
+import usePluginData from '@docusaurus/usePluginData'
 
 function MyComponent() {
-  const data = usePluginData('my-plugin');
-  return <div>{data}</div>;
+  const data = usePluginData('my-plugin')
+  return <div>{data}</div>
 }
 ```

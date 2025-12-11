@@ -38,7 +38,7 @@
 If you need more control, disable automatic configuration:
 
 ```javascript
-const glossaryPlugin = require('docusaurus-plugin-glossary');
+const glossaryPlugin = require('docusaurus-plugin-glossary')
 
 module.exports = {
   plugins: [
@@ -63,7 +63,7 @@ module.exports = {
       ],
     ],
   },
-};
+}
 ```
 
 ## Adding to Navbar
@@ -75,5 +75,5 @@ module.exports = {
       items: [{ to: '/glossary', label: 'Glossary', position: 'left' }],
     },
   },
-};
+}
 ```

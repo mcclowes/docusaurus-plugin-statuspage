@@ -22,4 +22,3 @@ export type StatuspageGlobalData = {
   position: NonNullable<StatuspagePluginOptions['position']>
   linkLabel: NonNullable<StatuspagePluginOptions['linkLabel']>
 }
-
