@@ -184,3 +184,16 @@ export function onClientEntry() {
   // Run after initial paint
   window.requestIdleCallback?.(checkAndRender) || setTimeout(checkAndRender, 0)
 }
+
+// Also export as default function with lifecycle hooks for Docusaurus 3.x
+export default function clientModule() {
+  return {
+    onRouteDidUpdate() {
+      // Only run once per page session
+      if (!initialized) {
+        initialized = true
+        window.requestIdleCallback?.(checkAndRender) || setTimeout(checkAndRender, 0)
+      }
+    },
+  }
+}

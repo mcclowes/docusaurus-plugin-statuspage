@@ -5,3 +5,11 @@ dist/
 .npmrc
 .env*
 
+# Example site build artifacts
+examples/*/build/
+examples/*/.docusaurus/
+
+# Playwright test results
+playwright-report/
+test-results/
+
