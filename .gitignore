@@ -13,3 +13,4 @@ examples/*/.docusaurus/
 playwright-report/
 test-results/
 
+default.profraw
