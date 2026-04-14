@@ -28,10 +28,7 @@ test.describe('Statuspage Plugin', () => {
 
       // Check meta tag exists with correct attributes
       const metaTag = page.locator('meta[name="docusaurus-statuspage"]')
-      await expect(metaTag).toHaveAttribute(
-        'data-statuspage-url',
-        'https://www.githubstatus.com'
-      )
+      await expect(metaTag).toHaveAttribute('data-statuspage-url', 'https://www.githubstatus.com')
       await expect(metaTag).toHaveAttribute('data-position', 'bottom-left')
       await expect(metaTag).toHaveAttribute('data-link-label', 'View status')
     })
@@ -41,10 +38,7 @@ test.describe('Statuspage Plugin', () => {
 
       // Check meta tag exists on docs pages too
       const metaTag = page.locator('meta[name="docusaurus-statuspage"]')
-      await expect(metaTag).toHaveAttribute(
-        'data-statuspage-url',
-        'https://www.githubstatus.com'
-      )
+      await expect(metaTag).toHaveAttribute('data-statuspage-url', 'https://www.githubstatus.com')
     })
   })
 })
