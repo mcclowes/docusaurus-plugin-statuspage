@@ -182,7 +182,11 @@ export function onClientEntry() {
   initialized = true
   if (typeof window === 'undefined' || typeof document === 'undefined') return
   // Run after initial paint
-  window.requestIdleCallback?.(checkAndRender) || setTimeout(checkAndRender, 0)
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(checkAndRender)
+  } else {
+    setTimeout(checkAndRender, 0)
+  }
 }
 
 // Also export as default function with lifecycle hooks for Docusaurus 3.x
@@ -192,7 +196,11 @@ export default function clientModule() {
       // Only run once per page session
       if (!initialized) {
         initialized = true
-        window.requestIdleCallback?.(checkAndRender) || setTimeout(checkAndRender, 0)
+        if (typeof window.requestIdleCallback === 'function') {
+          window.requestIdleCallback(checkAndRender)
+        } else {
+          setTimeout(checkAndRender, 0)
+        }
       }
     },
   }
