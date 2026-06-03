@@ -46,7 +46,8 @@
     "prepublishOnly": "npm run build && npm test"
   },
   "peerDependencies": {
-    "@docusaurus/types": "^2.4.0 || ^3.0.0"
+    "@docusaurus/core": "^3.0.0",
+    "@docusaurus/types": "^3.0.0"
   },
   "devDependencies": {
     "@docusaurus/types": "^3.0.0",
@@ -81,7 +82,7 @@
   "homepage": "https://github.com/mcclowes/docusaurus-plugin-statuspage#readme",
   "author": "mcclowes",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
