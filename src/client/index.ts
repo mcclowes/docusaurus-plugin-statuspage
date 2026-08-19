@@ -177,7 +177,7 @@ async function checkAndRender() {
   }
 }
 
-export function onClientEntry() {
+function scheduleCheck() {
   if (initialized) return
   initialized = true
   if (typeof window === 'undefined' || typeof document === 'undefined') return
@@ -189,19 +189,10 @@ export function onClientEntry() {
   }
 }
 
-// Also export as default function with lifecycle hooks for Docusaurus 3.x
-export default function clientModule() {
-  return {
-    onRouteDidUpdate() {
-      // Only run once per page session
-      if (!initialized) {
-        initialized = true
-        if (typeof window.requestIdleCallback === 'function') {
-          window.requestIdleCallback(checkAndRender)
-        } else {
-          setTimeout(checkAndRender, 0)
-        }
-      }
-    },
-  }
+// Docusaurus resolves client-module lifecycles as
+// `module.default?.[name] ?? module[name]`, so export them as named functions.
+// `onRouteDidUpdate` fires after the initial render (previousLocation is null)
+// and after every client-side navigation; the banner is only scheduled once.
+export function onRouteDidUpdate() {
+  scheduleCheck()
 }

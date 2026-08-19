@@ -68,7 +68,7 @@ jobs:
 
       - name: Run tests
         if: steps.check.outputs.skip == 'false'
-        run: npm test -- --ci
+        run: npm test
 
       - name: Create and push tag
         if: steps.check.outputs.skip == 'false'

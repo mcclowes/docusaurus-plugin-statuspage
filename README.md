@@ -129,7 +129,7 @@ export default function StatusInfo() {
 
 - Default export: the plugin function `(context, options) => Plugin`
 - Types: `StatuspagePluginOptions`
-- Client module: `client/index` with `onClientEntry` implementation
+- Client module: `client/index` exporting the `onRouteDidUpdate` Docusaurus lifecycle
 
 ## Contributing
 
