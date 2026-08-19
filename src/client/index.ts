@@ -76,14 +76,27 @@ function createBannerContainer(position: string) {
   return container
 }
 
-function renderBanner(
-  container: HTMLElement,
-  message: string,
-  linkHref: string,
-  linkLabel: string,
+type BannerOptions = {
+  message: string
+  linkHref: string
+  linkLabel: string
+  linkMode: 'label' | 'banner'
   bannerId: string
-) {
-  const wrapper = document.createElement('div')
+}
+
+function renderBanner(container: HTMLElement, opts: BannerOptions) {
+  const { message, linkHref, linkLabel, linkMode, bannerId } = opts
+
+  // In "banner" mode the whole surface is the link; in "label" mode it's a plain box
+  // with a separate link.
+  const wrapper = document.createElement(linkMode === 'banner' ? 'a' : 'div')
+  if (wrapper instanceof HTMLAnchorElement) {
+    wrapper.href = linkHref
+    wrapper.target = '_blank'
+    wrapper.rel = 'noopener noreferrer'
+    wrapper.style.textDecoration = 'none'
+    wrapper.style.cursor = 'pointer'
+  }
   wrapper.style.background = 'var(--ifm-color-emphasis-200, #f9f9fb)'
   wrapper.style.border = '1px solid var(--ifm-color-emphasis-300, #e5e7eb)'
   wrapper.style.boxShadow = '0 6px 20px rgba(0,0,0,0.12)'
@@ -107,16 +120,6 @@ function renderBanner(
   text.textContent = message
   text.style.flex = '1'
 
-  const link = document.createElement('a')
-  link.href = linkHref
-  link.target = '_blank'
-  link.rel = 'noopener noreferrer'
-  link.textContent = linkLabel
-  link.style.whiteSpace = 'nowrap'
-  link.style.fontWeight = '600'
-  link.style.color = 'var(--ifm-color-primary, #2563eb)'
-  link.style.textDecoration = 'underline'
-
   const close = document.createElement('button')
   close.type = 'button'
   close.setAttribute('aria-label', 'Dismiss status notice')
@@ -127,14 +130,29 @@ function renderBanner(
   close.style.fontSize = '18px'
   close.style.lineHeight = '1'
   close.style.padding = '0 0 0 6px'
-  close.onclick = () => {
+  close.style.color = 'inherit'
+  close.onclick = (e) => {
+    // Don't let the click bubble to the wrapping <a> in banner mode
+    e.preventDefault()
+    e.stopPropagation()
     addDismissed(bannerId)
     container.remove()
   }
 
   wrapper.appendChild(dot)
   wrapper.appendChild(text)
-  wrapper.appendChild(link)
+  if (linkMode === 'label') {
+    const link = document.createElement('a')
+    link.href = linkHref
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    link.textContent = linkLabel
+    link.style.whiteSpace = 'nowrap'
+    link.style.fontWeight = '600'
+    link.style.color = 'var(--ifm-color-primary, #2563eb)'
+    link.style.textDecoration = 'underline'
+    wrapper.appendChild(link)
+  }
   wrapper.appendChild(close)
   container.appendChild(wrapper)
 }
@@ -148,12 +166,16 @@ async function checkAndRender() {
   if (!baseUrl) return
   const position = meta.getAttribute('data-position') || 'bottom-left'
   const linkLabel = meta.getAttribute('data-link-label') || 'View status'
+  const messagePrefix = meta.getAttribute('data-message-prefix') || ''
+  const linkMode = meta.getAttribute('data-link-mode') === 'banner' ? 'banner' : 'label'
+  const endpoint = meta.getAttribute('data-endpoint') === 'status' ? 'status' : 'summary'
 
   try {
-    const response = await fetch(`${baseUrl}/api/v2/summary.json`, { credentials: 'omit' })
+    const response = await fetch(`${baseUrl}/api/v2/${endpoint}.json`, { credentials: 'omit' })
     if (!response.ok) return
     const data = (await response.json()) as StatuspageSummary
     const indicator = data?.status?.indicator || 'none'
+    // status.json has no incidents array; summary.json does
     const hasIncidents = Array.isArray(data?.incidents) && data!.incidents!.length > 0
     if (indicator === 'none' && !hasIncidents) return
 
@@ -165,19 +187,20 @@ async function checkAndRender() {
       return
     }
 
-    const message = data?.status?.description || 'Some services are degraded'
+    const description = data?.status?.description || 'Some services are degraded'
+    const message = `${messagePrefix}${description}`
     const linkHref =
       hasIncidents && data!.incidents![0]?.shortlink ? data!.incidents![0]!.shortlink! : baseUrl
 
     const container = createBannerContainer(position)
-    renderBanner(container, message, linkHref, linkLabel, bannerId)
+    renderBanner(container, { message, linkHref, linkLabel, linkMode, bannerId })
     document.body.appendChild(container)
   } catch {
     // Fail silently
   }
 }
 
-export function onClientEntry() {
+function scheduleCheck() {
   if (initialized) return
   initialized = true
   if (typeof window === 'undefined' || typeof document === 'undefined') return
@@ -189,19 +212,10 @@ export function onClientEntry() {
   }
 }
 
-// Also export as default function with lifecycle hooks for Docusaurus 3.x
-export default function clientModule() {
-  return {
-    onRouteDidUpdate() {
-      // Only run once per page session
-      if (!initialized) {
-        initialized = true
-        if (typeof window.requestIdleCallback === 'function') {
-          window.requestIdleCallback(checkAndRender)
-        } else {
-          setTimeout(checkAndRender, 0)
-        }
-      }
-    },
-  }
+// Docusaurus resolves client-module lifecycles as
+// `module.default?.[name] ?? module[name]`, so export them as named functions.
+// `onRouteDidUpdate` fires after the initial render (previousLocation is null)
+// and after every client-side navigation; the banner is only scheduled once.
+export function onRouteDidUpdate() {
+  scheduleCheck()
 }

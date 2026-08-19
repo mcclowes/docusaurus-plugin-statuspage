@@ -50,6 +50,7 @@ export default {
         statuspageUrl: 'https://www.githubstatus.com',
         position: 'bottom-left',
         linkLabel: 'View status',
+        messagePrefix: 'API status: ',
       }),
     ],
   ],

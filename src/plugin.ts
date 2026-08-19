@@ -12,6 +12,9 @@ export default function pluginStatuspage(
   const enabled = options.enabled ?? true
   const position = options.position ?? 'bottom-left'
   const linkLabel = options.linkLabel ?? 'View status'
+  const messagePrefix = options.messagePrefix ?? ''
+  const linkMode = options.linkMode ?? 'label'
+  const endpoint = options.endpoint ?? 'summary'
 
   return {
     name: 'docusaurus-plugin-statuspage',
@@ -24,6 +27,9 @@ export default function pluginStatuspage(
         statuspageUrl: options.statuspageUrl.replace(/\/$/, ''),
         position,
         linkLabel,
+        messagePrefix,
+        linkMode,
+        endpoint,
       }
       return globalData
     },
@@ -51,6 +57,9 @@ export default function pluginStatuspage(
               'data-statuspage-url': options.statuspageUrl.replace(/\/$/, ''),
               'data-position': position,
               'data-link-label': linkLabel,
+              'data-message-prefix': messagePrefix,
+              'data-link-mode': linkMode,
+              'data-endpoint': endpoint,
             },
           },
         ],

@@ -25,9 +25,12 @@ module.exports = {
       {
         statuspageUrl: 'https://acme.statuspage.io',
         // optional
-        enabled: true,
-        position: 'bottom-left', // 'bottom-right' | 'top-left' | 'top-right'
+        enabled: process.env.NODE_ENV === 'production',
+        position: 'bottom-right', // 'bottom-left' | 'top-left' | 'top-right'
         linkLabel: 'View status',
+        messagePrefix: 'API status: ',
+        linkMode: 'label', // 'banner' makes the whole banner the link
+        endpoint: 'summary', // 'status' for a lighter payload without incident links
       },
     ],
   ],
@@ -36,16 +39,21 @@ module.exports = {
 
 ## Options
 
-| Option          | Type      | Default         | Description                                                                     |
-| --------------- | --------- | --------------- | ------------------------------------------------------------------------------- |
-| `statuspageUrl` | `string`  | **required**    | Your Statuspage.io URL (e.g., `https://acme.statuspage.io`)                     |
-| `enabled`       | `boolean` | `true`          | Enable or disable the plugin                                                    |
-| `position`      | `string`  | `'bottom-left'` | Banner position: `'bottom-left'`, `'bottom-right'`, `'top-left'`, `'top-right'` |
-| `linkLabel`     | `string`  | `'View status'` | Text for the link to your status page                                           |
+| Option          | Type      | Default         | Description                                                                                                                         |
+| --------------- | --------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `statuspageUrl` | `string`  | **required**    | Your Statuspage.io URL (e.g., `https://acme.statuspage.io`)                                                                         |
+| `enabled`       | `boolean` | `true`          | Enable or disable the plugin                                                                                                        |
+| `position`      | `string`  | `'bottom-left'` | Banner position: `'bottom-left'`, `'bottom-right'`, `'top-left'`, `'top-right'`                                                     |
+| `linkLabel`     | `string`  | `'View status'` | Text for the link to your status page (ignored when `linkMode` is `'banner'`)                                                       |
+| `messagePrefix` | `string`  | `''`            | Text prepended to the status description, e.g. `'API status: '`                                                                     |
+| `linkMode`      | `string`  | `'label'`       | `'label'`: text plus a separate link. `'banner'`: the whole banner is the link                                                      |
+| `endpoint`      | `string`  | `'summary'`     | `'summary'` includes incidents (deep-links to the active one); `'status'` is a much smaller payload with the overall indicator only |
 
 ## How it works
 
-On build, the plugin injects a small `<meta name="docusaurus-statuspage" ...>` tag with your configured URL and options. On the client, a lightweight script fetches `GET {statuspageUrl}/api/v2/summary.json` and, if the `status.indicator` is not `none` or there are ongoing incidents, renders a small, dismissible banner that links to Statuspage.
+On build, the plugin injects a small `<meta name="docusaurus-statuspage" ...>` tag with your configured URL and options. On the client, a lightweight script fetches `GET {statuspageUrl}/api/v2/summary.json` (or `status.json` when `endpoint: 'status'`) and, if the `status.indicator` is not `none` or there are ongoing incidents, renders a small, dismissible banner that links to Statuspage.
+
+Set `enabled: process.env.NODE_ENV === 'production'` to keep the banner out of local development.
 
 ### Features
 
@@ -129,7 +137,7 @@ export default function StatusInfo() {
 
 - Default export: the plugin function `(context, options) => Plugin`
 - Types: `StatuspagePluginOptions`
-- Client module: `client/index` with `onClientEntry` implementation
+- Client module: `client/index` exporting the `onRouteDidUpdate` Docusaurus lifecycle
 
 ## Contributing
 
