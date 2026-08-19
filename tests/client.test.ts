@@ -9,6 +9,9 @@ function injectMeta(attrs: Record<string, string> = {}) {
   meta.setAttribute('data-statuspage-url', 'https://acme.statuspage.io')
   meta.setAttribute('data-position', attrs.position ?? 'bottom-left')
   meta.setAttribute('data-link-label', attrs.linkLabel ?? 'View status')
+  if (attrs.messagePrefix) meta.setAttribute('data-message-prefix', attrs.messagePrefix)
+  if (attrs.linkMode) meta.setAttribute('data-link-mode', attrs.linkMode)
+  if (attrs.endpoint) meta.setAttribute('data-endpoint', attrs.endpoint)
   document.head.appendChild(meta)
 }
 
@@ -159,5 +162,52 @@ describe('client module', () => {
     await flush()
 
     expect(banner()).toBeNull()
+  })
+
+  it('prepends messagePrefix to the status description', async () => {
+    injectMeta({ messagePrefix: 'API status: ' })
+    mockSummary({ status: { indicator: 'minor', description: 'Degraded' }, incidents: [] })
+    const mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+
+    expect(banner()?.textContent).toContain('API status: Degraded')
+  })
+
+  it('linkMode=banner makes the whole banner the link and drops the label', async () => {
+    injectMeta({ linkMode: 'banner' })
+    mockSummary({
+      status: { indicator: 'minor', description: 'Degraded' },
+      incidents: [{ id: 'x', shortlink: 'https://stspg.io/x' }],
+    })
+    const mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+
+    const el = banner()!
+    const anchors = el.querySelectorAll('a')
+    expect(anchors).toHaveLength(1)
+    expect(anchors[0].getAttribute('href')).toBe('https://stspg.io/x')
+    expect(anchors[0].textContent).toContain('Degraded')
+    expect(el.textContent).not.toContain('View status')
+    // close still works and does not navigate
+    ;(el.querySelector('button') as HTMLButtonElement).click()
+    expect(banner()).toBeNull()
+  })
+
+  it('endpoint=status fetches status.json and links to the status page', async () => {
+    injectMeta({ endpoint: 'status' })
+    const fetchMock = mockSummary({
+      page: { url: 'https://acme.statuspage.io' },
+      status: { indicator: 'minor', description: 'Partial outage' },
+    })
+    const mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+
+    expect(fetchMock).toHaveBeenCalledWith('https://acme.statuspage.io/api/v2/status.json', {
+      credentials: 'omit',
+    })
+    expect(banner()?.querySelector('a')?.getAttribute('href')).toBe('https://acme.statuspage.io')
   })
 })

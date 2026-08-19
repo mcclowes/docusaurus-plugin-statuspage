@@ -31,6 +31,9 @@ test.describe('Statuspage Plugin', () => {
       await expect(metaTag).toHaveAttribute('data-statuspage-url', 'https://www.githubstatus.com')
       await expect(metaTag).toHaveAttribute('data-position', 'bottom-left')
       await expect(metaTag).toHaveAttribute('data-link-label', 'View status')
+      await expect(metaTag).toHaveAttribute('data-message-prefix', 'API status: ')
+      await expect(metaTag).toHaveAttribute('data-link-mode', 'label')
+      await expect(metaTag).toHaveAttribute('data-endpoint', 'summary')
     })
 
     test('should inject meta tag on docs page', async ({ page }) => {
@@ -67,7 +70,7 @@ test.describe('Banner rendering', () => {
 
     const banner = page.locator(BANNER)
     await expect(banner).toBeVisible()
-    await expect(banner).toContainText('Partial System Outage')
+    await expect(banner).toContainText('API status: Partial System Outage')
     await expect(banner.getByRole('link', { name: 'View status' })).toHaveAttribute(
       'href',
       'https://stspg.io/e2e1'

@@ -55,6 +55,9 @@ describe('pluginStatuspage', () => {
         statuspageUrl: 'https://example.statuspage.io',
         position: 'bottom-left',
         linkLabel: 'View status',
+        messagePrefix: '',
+        linkMode: 'label',
+        endpoint: 'summary',
       })
     })
 
@@ -85,6 +88,20 @@ describe('pluginStatuspage', () => {
       })
       const content = await plugin.loadContent!()
       expect(content?.linkLabel).toBe('Check status')
+    })
+
+    it('should respect messagePrefix, linkMode and endpoint options', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const plugin = pluginStatuspage(createContext() as any, {
+        ...defaultOptions,
+        messagePrefix: 'API status: ',
+        linkMode: 'banner',
+        endpoint: 'status',
+      })
+      const content = await plugin.loadContent!()
+      expect(content?.messagePrefix).toBe('API status: ')
+      expect(content?.linkMode).toBe('banner')
+      expect(content?.endpoint).toBe('status')
     })
 
     it('should return undefined when disabled', async () => {
@@ -165,6 +182,9 @@ describe('pluginStatuspage', () => {
         statuspageUrl: 'https://example.statuspage.io',
         position: 'bottom-left',
         linkLabel: 'View status',
+        messagePrefix: '',
+        linkMode: 'label',
+        endpoint: 'summary',
       }
       const tags = plugin.injectHtmlTags!({ content })
       expect(tags).toEqual({
@@ -176,6 +196,9 @@ describe('pluginStatuspage', () => {
               'data-statuspage-url': 'https://example.statuspage.io',
               'data-position': 'bottom-left',
               'data-link-label': 'View status',
+              'data-message-prefix': '',
+              'data-link-mode': 'label',
+              'data-endpoint': 'summary',
             },
           },
         ],

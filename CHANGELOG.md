@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `messagePrefix` option (e.g. `'API status: '`), `linkMode: 'label' | 'banner'` (whole banner
+  clickable), and `endpoint: 'summary' | 'status'` (lighter payload, no incident deep-link).
 - Unit tests for the client module (jsdom) and E2E tests that assert the banner
   renders, stays hidden when operational, and persists dismissals.
 
