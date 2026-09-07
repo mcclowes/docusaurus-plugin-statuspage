@@ -6,5 +6,6 @@ examples/*/build/
 coverage/
 playwright-report/
 test-results/
+.claude/
 *.lock
 package-lock.json
