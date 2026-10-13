@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to the project.
 
-## Development Setup
+## Development setup
 
 1. **Clone the repository:**
 
@@ -44,10 +44,11 @@ Thank you for your interest in contributing! This document provides guidelines a
 5. **Run the example site:**
 
    ```bash
+   npm --prefix examples/docusaurus-v3 install
    npm run example:start
    ```
 
-## Project Structure
+## Project structure
 
 ```
 docusaurus-plugin-statuspage/
@@ -57,8 +58,9 @@ docusaurus-plugin-statuspage/
 │   ├── types.ts           # TypeScript type definitions
 │   └── client/
 │       └── index.ts       # Client-side banner logic
-├── __tests__/
-│   └── plugin.test.ts     # Unit tests
+├── tests/
+│   ├── plugin.test.ts     # Server-side plugin tests
+│   └── client.test.ts     # Banner and dismissal tests in jsdom
 ├── e2e/
 │   └── statuspage.spec.js # E2E tests
 ├── examples/
@@ -69,9 +71,9 @@ docusaurus-plugin-statuspage/
 
 ## Testing
 
-### Unit Tests
+### Unit tests
 
-Unit tests use Jest and test the plugin's server-side logic:
+Unit tests use Vitest to check the server-side plugin and the client banner behavior in jsdom:
 
 ```bash
 npm test              # Run tests once
@@ -79,13 +81,17 @@ npm run test:watch    # Watch mode
 npm run test:coverage # With coverage report
 ```
 
-### E2E Tests
+### E2E tests
 
 E2E tests use Playwright and test the full plugin behavior in a browser:
 
 ```bash
-# First, build the example site
+# Install the example dependencies and build the site
+npm --prefix examples/docusaurus-v3 install
 npm run example:build
+
+# Install the Chromium browser used by the tests
+npx playwright install chromium
 
 # Run E2E tests
 npm run test:e2e
@@ -94,7 +100,9 @@ npm run test:e2e
 npm run test:e2e:ui
 ```
 
-## Code Style
+On Linux, use `npx playwright install --with-deps chromium` to install the browser's system dependencies, as the E2E workflow does. The tests start their own local example server on port 4000.
+
+## Code style
 
 We use Prettier for code formatting:
 
@@ -103,7 +111,7 @@ npm run format        # Format all files
 npm run format:check  # Check formatting
 ```
 
-## Pull Request Process
+## Pull request process
 
 1. Fork the repository and create a feature branch
 2. Make your changes
@@ -111,7 +119,7 @@ npm run format:check  # Check formatting
 4. Format code: `npm run format`
 5. Create a PR with a clear description
 
-## Commit Messages
+## Commit messages
 
 We prefer conventional commit messages:
 
@@ -121,7 +129,7 @@ We prefer conventional commit messages:
 - `test: add tests for X`
 - `chore: update dependencies`
 
-## Release Process
+## Release process
 
 Releases are automated via GitHub Actions when a new release is published.
 
