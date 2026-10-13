@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+/// <reference types="vitest/jsdom" />
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const SUMMARY_URL = 'https://acme.statuspage.io/api/v2/summary.json'
@@ -42,6 +43,7 @@ describe('client module', () => {
   beforeEach(() => {
     document.head.innerHTML = ''
     document.body.innerHTML = ''
+    vi.stubGlobal('localStorage', jsdom.window.localStorage)
     localStorage.clear()
   })
 
