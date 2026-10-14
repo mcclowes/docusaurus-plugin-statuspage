@@ -48,6 +48,14 @@ Thank you for your interest in contributing! This document provides guidelines a
    npm run example:start
    ```
 
+   Pass custom Docusaurus options after `--`:
+
+   ```bash
+   npm run example:start -- --port 4317
+   npm run example:build -- --out-dir "output with spaces"
+   npm run example:serve -- --port 4317 --dir "output with spaces"
+   ```
+
 ## Project structure
 
 ```
@@ -75,6 +83,8 @@ docusaurus-plugin-statuspage/
 ### Unit tests
 
 Vitest checks the server-side plugin, client banner behavior in jsdom, and the packed package.
+
+It also checks the example helpers through both npm layers in temporary fixture directories, including custom options, paths with spaces, and the browser-test server's default port. These checks run with `npm test` and do not install dependencies or start the actual example site.
 
 The package test builds into a temporary directory, packs without lifecycle scripts, and checks the archive's advertised files, ESM/CommonJS imports, and client-module resolution. It runs as part of `npm test` and removes its temporary files afterward.
 
