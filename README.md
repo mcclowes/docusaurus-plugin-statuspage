@@ -5,6 +5,12 @@
 
 Displays a discreet banner on initial page load if your public `statuspage.io` reports degraded service or ongoing incidents. Links users to your Statuspage for more details.
 
+## Compatibility
+
+| Plugin version | Docusaurus                       | React | Node   |
+| -------------- | -------------------------------- | ----- | ------ |
+| `0.2.x`        | `^3.0.0` (tested up to `3.10.1`) | `^18` | `>=18` |
+
 ## Installation
 
 ```bash

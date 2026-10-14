@@ -41,11 +41,11 @@ export default {
       "classic",
       {
         "docs": {
-          "sidebarPath": "/Users/mcclowes/Development/mcclowes/docusaurus-plugin-statuspage/examples/docusaurus-v3/sidebars.js"
+          "sidebarPath": "/Users/mcclowes/Development/docusaurus/docusaurus-plugin-statuspage/examples/docusaurus-v3/sidebars.js"
         },
         "blog": false,
         "theme": {
-          "customCss": "/Users/mcclowes/Development/mcclowes/docusaurus-plugin-statuspage/examples/docusaurus-v3/src/css/custom.css"
+          "customCss": "/Users/mcclowes/Development/docusaurus/docusaurus-plugin-statuspage/examples/docusaurus-v3/src/css/custom.css"
         }
       }
     ]
@@ -243,12 +243,19 @@ export default {
     }
   },
   "baseUrlIssueBanner": true,
+  "storage": {
+    "type": "localStorage",
+    "namespace": false
+  },
   "future": {
     "v4": {
       "removeLegacyPostBuildHeadAttribute": false,
-      "useCssCascadeLayers": false
+      "useCssCascadeLayers": false,
+      "siteStorageNamespacing": false,
+      "fasterByDefault": false,
+      "mdx1CompatDisabledByDefault": false
     },
-    "experimental_faster": {
+    "faster": {
       "swcJsLoader": false,
       "swcJsMinimizer": false,
       "swcHtmlMinimizer": false,
@@ -256,12 +263,10 @@ export default {
       "mdxCrossCompilerCache": false,
       "rspackBundler": false,
       "rspackPersistentCache": false,
-      "ssgWorkerThreads": false
+      "ssgWorkerThreads": false,
+      "gitEagerVcs": false
     },
-    "experimental_storage": {
-      "type": "localStorage",
-      "namespace": false
-    },
+    "experimental_vcs": {},
     "experimental_router": "browser"
   },
   "onBrokenAnchors": "warn",
