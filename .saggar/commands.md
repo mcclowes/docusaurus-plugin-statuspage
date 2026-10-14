@@ -2,7 +2,7 @@
 
 ## Checks
 
-- Tests: `npm test` #quick #safe #ci
+- Tests: `npm test` — includes a temporary package build and packed import checks #quick #safe #ci
 - Typecheck: `npm run typecheck` #quick #safe #ci
 - Lint: `npm run lint` #quick #safe #ci
 - Check formatting: `npm run format:check` #quick #safe #ci

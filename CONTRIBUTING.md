@@ -60,7 +60,8 @@ docusaurus-plugin-statuspage/
 │       └── index.ts       # Client-side banner logic
 ├── tests/
 │   ├── plugin.test.ts     # Server-side plugin tests
-│   └── client.test.ts     # Banner and dismissal tests in jsdom
+│   ├── client.test.ts     # Banner and dismissal tests in jsdom
+│   └── package.test.ts    # Built tarball exports and cold Node imports
 ├── e2e/
 │   └── statuspage.spec.js # E2E tests
 ├── examples/
@@ -73,7 +74,9 @@ docusaurus-plugin-statuspage/
 
 ### Unit tests
 
-Unit tests use Vitest to check the server-side plugin and the client banner behavior in jsdom:
+Vitest checks the server-side plugin, client banner behavior in jsdom, and the packed package.
+
+The package test builds into a temporary directory, packs without lifecycle scripts, and checks the archive's advertised files, ESM/CommonJS imports, and client-module resolution. It runs as part of `npm test` and removes its temporary files afterward.
 
 ```bash
 npm test              # Run tests once
