@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to the project.
 
-## Development Setup
+## Development setup
 
 1. **Clone the repository:**
 
@@ -44,10 +44,19 @@ Thank you for your interest in contributing! This document provides guidelines a
 5. **Run the example site:**
 
    ```bash
+   npm --prefix examples/docusaurus-v3 install
    npm run example:start
    ```
 
-## Project Structure
+   Pass custom Docusaurus options after `--`:
+
+   ```bash
+   npm run example:start -- --port 4317
+   npm run example:build -- --out-dir "output with spaces"
+   npm run example:serve -- --port 4317 --dir "output with spaces"
+   ```
+
+## Project structure
 
 ```
 docusaurus-plugin-statuspage/
@@ -57,8 +66,10 @@ docusaurus-plugin-statuspage/
 │   ├── types.ts           # TypeScript type definitions
 │   └── client/
 │       └── index.ts       # Client-side banner logic
-├── __tests__/
-│   └── plugin.test.ts     # Unit tests
+├── tests/
+│   ├── plugin.test.ts     # Server-side plugin tests
+│   ├── client.test.ts     # Banner and dismissal tests in jsdom
+│   └── package.test.ts    # Built tarball exports and cold Node imports
 ├── e2e/
 │   └── statuspage.spec.js # E2E tests
 ├── examples/
@@ -69,9 +80,13 @@ docusaurus-plugin-statuspage/
 
 ## Testing
 
-### Unit Tests
+### Unit tests
 
-Unit tests use Jest and test the plugin's server-side logic:
+Vitest checks the server-side plugin, client banner behavior in jsdom, and the packed package.
+
+It also checks the example helpers through both npm layers in temporary fixture directories, including custom options, paths with spaces, and the browser-test server's default port. These checks run with `npm test` and do not install dependencies or start the actual example site.
+
+The package test builds into a temporary directory, packs without lifecycle scripts, and checks the archive's advertised files, ESM/CommonJS imports, and client-module resolution. It runs as part of `npm test` and removes its temporary files afterward.
 
 ```bash
 npm test              # Run tests once
@@ -79,13 +94,17 @@ npm run test:watch    # Watch mode
 npm run test:coverage # With coverage report
 ```
 
-### E2E Tests
+### E2E tests
 
 E2E tests use Playwright and test the full plugin behavior in a browser:
 
 ```bash
-# First, build the example site
+# Install the example dependencies and build the site
+npm --prefix examples/docusaurus-v3 install
 npm run example:build
+
+# Install the Chromium browser used by the tests
+npx playwright install chromium
 
 # Run E2E tests
 npm run test:e2e
@@ -94,7 +113,9 @@ npm run test:e2e
 npm run test:e2e:ui
 ```
 
-## Code Style
+On Linux, use `npx playwright install --with-deps chromium` to install the browser's system dependencies, as the E2E workflow does. The tests start their own local example server on port 4000.
+
+## Code style
 
 We use Prettier for code formatting:
 
@@ -103,7 +124,7 @@ npm run format        # Format all files
 npm run format:check  # Check formatting
 ```
 
-## Pull Request Process
+## Pull request process
 
 1. Fork the repository and create a feature branch
 2. Make your changes
@@ -111,7 +132,7 @@ npm run format:check  # Check formatting
 4. Format code: `npm run format`
 5. Create a PR with a clear description
 
-## Commit Messages
+## Commit messages
 
 We prefer conventional commit messages:
 
@@ -121,7 +142,7 @@ We prefer conventional commit messages:
 - `test: add tests for X`
 - `chore: update dependencies`
 
-## Release Process
+## Release process
 
 Releases are automated via GitHub Actions when a new release is published.
 

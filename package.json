@@ -5,17 +5,17 @@
   "license": "MIT",
   "type": "module",
   "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./client": {
       "types": "./dist/client/index.d.ts",
-      "import": "./dist/client/index.mjs",
+      "import": "./dist/client/index.js",
       "require": "./dist/client/index.cjs"
     }
   },
@@ -36,9 +36,9 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "example:start": "npm --prefix examples/docusaurus-v3 run start",
-    "example:build": "npm --prefix examples/docusaurus-v3 run build",
-    "example:serve": "npm --prefix examples/docusaurus-v3 run serve",
+    "example:start": "npm --prefix examples/docusaurus-v3 run start --",
+    "example:build": "npm --prefix examples/docusaurus-v3 run build --",
+    "example:serve": "npm --prefix examples/docusaurus-v3 run serve --",
     "example:serve:e2e": "npm --prefix examples/docusaurus-v3 run serve -- --port 4000",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\"",

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+/// <reference types="vitest/jsdom" />
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 const SUMMARY_URL = 'https://acme.statuspage.io/api/v2/summary.json'
@@ -42,6 +43,7 @@ describe('client module', () => {
   beforeEach(() => {
     document.head.innerHTML = ''
     document.body.innerHTML = ''
+    vi.stubGlobal('localStorage', jsdom.window.localStorage)
     localStorage.clear()
   })
 
@@ -148,6 +150,123 @@ describe('client module', () => {
 
     // New incident -> banner shows again
     mockSummary({ ...summary, incidents: [{ id: 'inc-2', shortlink: 'https://stspg.io/inc-2' }] })
+    mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+    expect(banner()).not.toBeNull()
+  })
+
+  it('recovers string storage without suppressing a different incident by substring', async () => {
+    injectMeta()
+    localStorage.setItem('statuspage-dismissed-banners', JSON.stringify('incident-inc-10'))
+    mockSummary({
+      status: { indicator: 'minor', description: 'Degraded' },
+      incidents: [{ id: 'inc-1' }],
+    })
+    const mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+
+    expect(banner()).not.toBeNull()
+    ;(banner()!.querySelector('button') as HTMLButtonElement).click()
+    expect(JSON.parse(localStorage.getItem('statuspage-dismissed-banners') ?? '[]')).toEqual([
+      'incident-inc-1',
+    ])
+  })
+
+  it.each(['null', 'true', '7', '{}', '{invalid'])(
+    'repairs malformed storage %s on dismissal',
+    async (stored) => {
+      injectMeta()
+      localStorage.setItem('statuspage-dismissed-banners', stored)
+      mockSummary({
+        status: { indicator: 'minor', description: 'Degraded' },
+        incidents: [{ id: 'repair' }],
+      })
+      let mod = await loadClientModule()
+      mod.onRouteDidUpdate()
+      await flush()
+
+      expect(banner()).not.toBeNull()
+      ;(banner()!.querySelector('button') as HTMLButtonElement).click()
+      expect(banner()).toBeNull()
+      expect(JSON.parse(localStorage.getItem('statuspage-dismissed-banners') ?? '[]')).toEqual([
+        'incident-repair',
+      ])
+
+      mod = await loadClientModule()
+      mod.onRouteDidUpdate()
+      await flush()
+      expect(banner()).toBeNull()
+    }
+  )
+
+  it('keeps valid dismissal IDs from mixed arrays and matches them exactly', async () => {
+    injectMeta()
+    localStorage.setItem(
+      'statuspage-dismissed-banners',
+      JSON.stringify(['incident-inc-10', null, 7, {}, 'incident-existing'])
+    )
+    mockSummary({
+      status: { indicator: 'minor', description: 'Degraded' },
+      incidents: [{ id: 'inc-1' }],
+    })
+    const mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+
+    expect(banner()).not.toBeNull()
+    ;(banner()!.querySelector('button') as HTMLButtonElement).click()
+    expect(JSON.parse(localStorage.getItem('statuspage-dismissed-banners') ?? '[]')).toEqual([
+      'incident-inc-10',
+      'incident-existing',
+      'incident-inc-1',
+    ])
+  })
+
+  it('dismisses locally without overwriting history when storage reads are blocked', async () => {
+    injectMeta()
+    const storage = jsdom.window.localStorage
+    storage.setItem('statuspage-dismissed-banners', '["incident-existing"]')
+    const setItem = vi.fn()
+    vi.stubGlobal('localStorage', {
+      getItem: () => {
+        throw new DOMException('blocked', 'SecurityError')
+      },
+      setItem,
+    })
+    mockSummary({ status: { indicator: 'minor', description: 'Degraded' } })
+    const mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+
+    expect(banner()).not.toBeNull()
+    ;(banner()!.querySelector('button') as HTMLButtonElement).click()
+    expect(banner()).toBeNull()
+    expect(setItem).not.toHaveBeenCalled()
+    expect(storage.getItem('statuspage-dismissed-banners')).toBe('["incident-existing"]')
+  })
+
+  it('dismisses locally when storage writes fail and can show the notice after reload', async () => {
+    injectMeta()
+    const storage = jsdom.window.localStorage
+    storage.setItem('statuspage-dismissed-banners', '["incident-existing"]')
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => storage.getItem(key),
+      setItem: () => {
+        throw new DOMException('full', 'QuotaExceededError')
+      },
+    })
+    mockSummary({ status: { indicator: 'minor', description: 'Degraded' } })
+    let mod = await loadClientModule()
+    mod.onRouteDidUpdate()
+    await flush()
+
+    expect(banner()).not.toBeNull()
+    ;(banner()!.querySelector('button') as HTMLButtonElement).click()
+    expect(banner()).toBeNull()
+    expect(storage.getItem('statuspage-dismissed-banners')).toBe('["incident-existing"]')
+
     mod = await loadClientModule()
     mod.onRouteDidUpdate()
     await flush()

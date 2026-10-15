@@ -48,13 +48,15 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Run tests
-        run: npm test -- --ci
+        run: npm test
 
       - name: Bump version
         id: version
+        env:
+          VERSION_TYPE: ${{ github.event.inputs.version_type }}
         run: |
-          NEW_VERSION=$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          NEW_VERSION=$(npm version "$VERSION_TYPE" --no-git-tag-version)
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "Bumped version to $NEW_VERSION"
 
       - name: Create pull request
