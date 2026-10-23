@@ -29,24 +29,32 @@ function simpleHash(str: string): string {
   return Math.abs(hash).toString(36)
 }
 
-function isDismissed(bannerId: string): boolean {
+function readDismissedBannerIds(): string[] | undefined {
+  let dismissed: string | null
   try {
-    const dismissed = localStorage.getItem(DISMISSED_BANNERS_KEY)
-    if (!dismissed) return false
-    const dismissedList = JSON.parse(dismissed) as string[]
-    return dismissedList.includes(bannerId)
+    dismissed = localStorage.getItem(DISMISSED_BANNERS_KEY)
   } catch {
-    return false
+    return undefined
+  }
+  if (!dismissed) return []
+  try {
+    const dismissedList: unknown = JSON.parse(dismissed)
+    return Array.isArray(dismissedList)
+      ? dismissedList.filter((id): id is string => typeof id === 'string')
+      : []
+  } catch {
+    return []
   }
 }
 
+function isDismissed(bannerId: string): boolean {
+  return readDismissedBannerIds()?.includes(bannerId) ?? false
+}
+
 function addDismissed(bannerId: string): void {
+  const dismissedList = readDismissedBannerIds()
+  if (!dismissedList) return
   try {
-    const dismissed = localStorage.getItem(DISMISSED_BANNERS_KEY)
-    let dismissedList: string[] = []
-    if (dismissed) {
-      dismissedList = JSON.parse(dismissed) as string[]
-    }
     if (!dismissedList.includes(bannerId)) {
       dismissedList.push(bannerId)
       localStorage.setItem(DISMISSED_BANNERS_KEY, JSON.stringify(dismissedList))
