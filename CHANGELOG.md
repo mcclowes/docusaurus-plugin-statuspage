@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Example start, build, and serve helpers forward custom Docusaurus options instead of letting npm consume them (#113).
+- Contributor instructions now describe Vitest and include example-site and browser-test prerequisites (#110).
+- Client tests use jsdom browser storage instead of Node's built-in storage accessor (#109).
 - The banner never rendered: the client module exported `onClientEntry` (a Gatsby
   lifecycle) instead of a Docusaurus one. It now exports `onRouteDidUpdate`, which
   Docusaurus dispatches after the initial render and every navigation.

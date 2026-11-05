@@ -82,6 +82,7 @@ npm run dev
 ### Run the example site
 
 ```bash
+npm --prefix examples/docusaurus-v3 install
 npm run example:start
 ```
 
@@ -95,7 +96,9 @@ npm test
 npm run test:watch
 
 # E2E tests (requires building example site first)
+npm --prefix examples/docusaurus-v3 install
 npm run example:build
+npx playwright install chromium
 npm run test:e2e
 ```
 
